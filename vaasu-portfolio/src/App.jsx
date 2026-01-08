@@ -1,7 +1,221 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Github, Linkedin, Mail, Phone, ExternalLink, Code, Briefcase, GraduationCap, Award, Heart, Activity, Zap } from 'lucide-react';
+import { Github, Linkedin, Mail, Phone, ExternalLink, Code, Briefcase, GraduationCap, Award, Heart, Activity, Zap, BookOpen, ArrowLeft, Calendar, Clock } from 'lucide-react';
 
-export default function App() {
+// ArticlesPage Component
+function ArticlesPage({ onBack }) {
+  const [filter, setFilter] = useState('all');
+  const [articleCount, setArticleCount] = useState(0);
+  const [totalReadTime, setTotalReadTime] = useState(0);
+  const canvasRef = useRef(null);
+
+  const articlesData = [
+    {
+      title: "Event loop: Scaling My Backend Without Threads",
+      description: "Deep dive into creating scalable WebSocket architectures for continuous patient data streams. Handling 10,000+ concurrent connections with sub-100ms latency.",
+      category: "Architecture",
+      platform: "Medium",
+      url: "https://medium.com/@vaasubisht/event-loop-scaling-my-backend-without-threads-4e93c2faa9c5?postPublishedType=initial",
+      readTime: 7,
+      date: "Jan 2025",
+      icon: "🏥"
+    },
+    {
+      title: "Translating Chaos: How I Built a High-Performance FIX Gateway Without Losing My Mind",
+      description: " In a high-frequency environment, a millisecond is an eternity, and a microsecond is a long lunch break. I couldn’t just write a basic server loop and hope for the best.",
+      category: "Architecture",
+      platform: "Medium",
+      url: "https://medium.com/@vaasubisht/translating-chaos-how-i-built-a-high-performance-fix-gateway-without-losing-my-mind-b69ade061d78",
+      readTime: 3,
+      date: "Dec 2025",
+      icon: "🔒"
+    },
+    {
+      title: "Stealing from CppCon: How I Built a Robust Queue So My Engine Wouldn’t Crash",
+      description: "It turns out, processes are like toddlers: if you leave them unsupervised in a shared memory playground, they will hurt themselves.",
+      category: "Architecture",
+      platform: "Medium",
+      url: "https://medium.com/@vaasubisht/stealing-from-cppcon-how-i-built-a-robust-queue-so-my-engine-wouldnt-crash-3b367ab0c509",
+      readTime: 3,
+      date: "Dec 2025",
+      icon: "🧠"
+    }
+  ];
+
+  const categories = ['all', ...new Set(articlesData.map(a => a.category))];
+  const filteredArticles = filter === 'all' ? articlesData : articlesData.filter(a => a.category === filter);
+
+  useEffect(() => {
+    let count = 0;
+    const target = articlesData.length;
+    const interval = setInterval(() => {
+      if (count < target) {
+        count++;
+        setArticleCount(count);
+      } else {
+        clearInterval(interval);
+      }
+    }, 50);
+
+    const total = articlesData.reduce((sum, a) => sum + a.readTime, 0);
+    let time = 0;
+    const timeInterval = setInterval(() => {
+      if (time < total) {
+        time += Math.ceil(total / 30);
+        setTotalReadTime(Math.min(time, total));
+      } else {
+        clearInterval(timeInterval);
+      }
+    }, 30);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(timeInterval);
+    };
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let time = 0;
+    let animationId;
+
+    const drawHeartbeat = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'rgba(0, 245, 255, 0.15)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      
+      for (let x = 0; x < canvas.width; x += 5) {
+        let y = canvas.height / 2;
+        const offset = x + time;
+        
+        if (offset % 400 < 50) {
+          y += Math.sin((offset % 50) * 0.4) * 80;
+        }
+        
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      
+      ctx.stroke();
+      time += 2;
+      animationId = requestAnimationFrame(drawHeartbeat);
+    };
+
+    drawHeartbeat();
+
+    return () => cancelAnimationFrame(animationId);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white overflow-x-hidden">
+      <canvas ref={canvasRef} className="fixed inset-0 opacity-10 pointer-events-none" />
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-20">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50 rounded-lg transition-all mb-8"
+        >
+          <ArrowLeft size={20} />
+          <span>Back to Home</span>
+        </button>
+
+        <div className="text-center mb-16">
+          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-500 bg-clip-text text-transparent mb-6">
+            Knowledge Archive
+          </h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-12">
+            {/* Technical insights, medical innovations, and stories from the frontlines of healthcare technology */}
+          </p>
+
+          <div className="flex justify-center gap-16 flex-wrap">
+            <div className="text-center">
+              <div className="text-5xl font-bold text-cyan-400 mb-2">{articleCount}</div>
+              <div className="text-gray-400 text-sm uppercase tracking-wider">Articles</div>
+            </div>
+            {/* <div className="text-center">
+              <div className="text-5xl font-bold text-cyan-400 mb-2">∞</div>
+              <div className="text-gray-400 text-sm uppercase tracking-wider">Lives Impacted</div>
+            </div> */}
+            <div className="text-center">
+              <div className="text-5xl font-bold text-cyan-400 mb-2">{totalReadTime}</div>
+              <div className="text-gray-400 text-sm uppercase tracking-wider">Min Read Time</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-center gap-4 mb-12 flex-wrap">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setFilter(cat)}
+              className={`px-6 py-3 rounded-full transition-all font-semibold ${
+                filter === cat
+                  ? 'bg-cyan-500/20 border-2 border-cyan-400 text-cyan-300'
+                  : 'bg-slate-800/60 border border-cyan-500/20 text-gray-400 hover:border-cyan-400/50'
+              }`}
+            >
+              {cat === 'all' ? 'All Articles' : cat}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredArticles.map((article, idx) => (
+            <div
+              key={idx}
+              onClick={() => window.open(article.url, '_blank')}
+              className="bg-gradient-to-br from-slate-900/90 to-slate-800/70 border border-cyan-500/20 rounded-2xl p-8 hover:border-cyan-400/50 hover:-translate-y-2 transition-all cursor-pointer group relative overflow-hidden backdrop-blur"
+            >
+              <div className="absolute top-4 right-4 px-3 py-1 bg-blue-500/20 border border-blue-500/40 rounded-lg text-xs font-semibold text-blue-300">
+                {article.platform}
+              </div>
+
+              <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-6">
+                {article.icon}
+              </div>
+
+              <div className="inline-block px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-xs font-semibold text-cyan-300 uppercase tracking-wide mb-4">
+                {article.category}
+              </div>
+
+              <h3 className="text-2xl font-bold text-white mb-3 leading-tight">
+                {article.title}
+              </h3>
+
+              <p className="text-gray-300 leading-relaxed mb-6">
+                {article.description}
+              </p>
+
+              <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
+                <div className="flex items-center gap-1">
+                  <Calendar size={16} />
+                  <span>{article.date}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock size={16} />
+                  <span>{article.readTime} min read</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-cyan-400 font-semibold text-sm group-hover:gap-3 transition-all">
+                <span>Read Article</span>
+                <ExternalLink size={16} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HomePage({ onNavigateToArticles }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
   const [showProjectPage, setShowProjectPage] = useState(false);
@@ -88,7 +302,7 @@ export default function App() {
     {
       title: "Stock exchange",
       status: "Under development",
-      description: "A high-performance stock exchange consisiting various components like matching-engine, gateway etc.",
+      description: "A high-performance stock exchange consisting various components like matching-engine, gateway etc.",
       icon: "⚡",
       theme: {
         primary: "from-blue-500/20 to-cyan-500/20",
@@ -210,15 +424,11 @@ export default function App() {
   ];
 
   const skills = {
-    "Languages": ["C++", ,"Go", "Java", "Python", "SQL", "TypeScript"],
+    "Languages": ["C++", "Go", "Java", "Python", "SQL", "TypeScript"],
     "Medical": ["DICOM", "Vessel centerline", "3D geometry", "Unit Testing"],
     "Backend": ["Distributed systems", "Node.js", "Docker", "Redis", "RabbitMQ", "MongoDB", "PostgreSQL", "AWS"],
     "Compliance": ["EU AI Act Article 14", "Risk Control"]
   };
-
-  if (showProjectPage) {
-    return <ProjectsPage projects={projects} onBack={() => setShowProjectPage(false)} />;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white overflow-x-hidden">
@@ -255,6 +465,12 @@ export default function App() {
             </p>
 
             <div className="flex flex-wrap justify-center gap-4 pt-8">
+              <button
+                onClick={onNavigateToArticles}
+                className="flex items-center gap-2 px-6 py-3 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/50 rounded-lg transition-all">
+                <BookOpen size={20} />
+                <span>Articles</span>
+              </button>
               <a href="https://github.com/vaasu2002" target="_blank" rel="noopener noreferrer" 
                 className="flex items-center gap-2 px-6 py-3 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50 rounded-lg transition-all">
                 <Github size={20} />
@@ -289,9 +505,6 @@ export default function App() {
           </p>
         </div>
       </section>
-
-
-
 
       <section className="relative py-20 px-6 bg-slate-900/30">
         <div className="max-w-6xl mx-auto">
@@ -348,8 +561,7 @@ export default function App() {
             {projects.map((project, idx) => (
               <div 
                 key={idx} 
-                className={`bg-gradient-to-br ${project.theme.primary} border ${project.theme.border} rounded-xl p-6 hover:shadow-xl transition-all backdrop-blur group cursor-pointer`}
-                onClick={() => setShowProjectPage(true)}
+                className={`bg-gradient-to-br ${project.theme.primary} border ${project.theme.border} rounded-xl p-6 hover:shadow-xl transition-all backdrop-blur group`}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="text-4xl">{project.icon}</div>
@@ -372,17 +584,12 @@ export default function App() {
                   ))}
                 </div>
 
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-2">
                   {project.tech.map((tech, i) => (
                     <span key={i} className={`px-2 py-1 ${project.theme.bg} border ${project.theme.border} rounded text-xs ${project.theme.accent}`}>
                       {tech}
                     </span>
                   ))}
-                </div>
-
-                <div className={`flex items-center gap-2 ${project.theme.accent} text-sm font-semibold`}>
-                  <span>View All Projects</span>
-                  <ExternalLink size={16} />
                 </div>
               </div>
             ))}
@@ -446,4 +653,14 @@ export default function App() {
       </footer>
     </div>
   );
+}
+
+export default function App() {
+  const [currentPage, setCurrentPage] = useState('home');
+
+  if (currentPage === 'articles') {
+    return <ArticlesPage onBack={() => setCurrentPage('home')} />;
+  }
+
+  return <HomePage onNavigateToArticles={() => setCurrentPage('articles')} />;
 }
