@@ -11,7 +11,7 @@ function ArticlesPage({ onBack }) {
   const articlesData = [
     {
       title: "Event loop: Scaling My Backend Without Threads",
-      description: "Deep dive into creating scalable WebSocket architectures for continuous patient data streams. Handling 10,000+ concurrent connections with sub-100ms latency.",
+      description: "Rather than handling I/O ourselves in the application code, we delegate the responsibility of handling I/O to the operating system. The ability to monitor multiple I/O sources is provided by the OS kernel through its system call interface.",
       category: "Architecture",
       platform: "Medium",
       url: "https://medium.com/@vaasubisht/event-loop-scaling-my-backend-without-threads-4e93c2faa9c5?postPublishedType=initial",
